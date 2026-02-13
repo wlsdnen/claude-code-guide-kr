@@ -1,0 +1,32 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/
+*.local.json
+*.local.md
+
+# OMC state
+.omc/
+
+# Environment
+.env*
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+*.orig
+
+# Node (if any tooling is added later)
+node_modules/

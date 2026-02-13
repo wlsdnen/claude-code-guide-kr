@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 종합 설정 가이드</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface-2: #232736;
+            --border: #2e3348;
+            --text: #e4e4e7;
+            --text-dim: #9ca3af;
+            --accent: #c084fc;
+            --accent-2: #818cf8;
+            --accent-3: #34d399;
+            --accent-4: #fb923c;
+            --accent-5: #f472b6;
+            --danger: #ef4444;
+            --code-bg: #161922;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            padding: 80px 0 60px;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1035 0%, #0f1117 50%, #0d1520 100%);
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(192, 132, 252, 0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(129, 140, 248, 0.05) 0%, transparent 50%);
+            animation: drift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-30px, -20px); }
+        }
+
+        .hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .hero h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 16px; background: linear-gradient(135deg, #c084fc, #818cf8, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero p { font-size: 1.15rem; color: var(--text-dim); max-width: 600px; margin: 0 auto 24px; }
+        .hero .meta { font-size: 0.85rem; color: #6b7280; }
+        .hero .meta span { margin: 0 8px; }
+
+        /* Nav */
+        .toc {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 17, 23, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            overflow-x: auto;
+        }
+
+        .toc-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+        }
+
+        .toc a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 6px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .toc a:hover { color: var(--accent); background: rgba(192, 132, 252, 0.08); }
+
+        /* Layout */
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+        /* Sections */
+        section {
+            padding: 64px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        section:last-child { border-bottom: none; }
+
+        h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 .num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(192, 132, 252, 0.1);
+            border: 1px solid rgba(192, 132, 252, 0.2);
+            border-radius: 6px;
+            padding: 2px 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .section-desc {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            margin-bottom: 40px;
+            max-width: 700px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 36px 0 16px;
+            color: var(--text);
+            padding-left: 14px;
+            border-left: 3px solid var(--accent-2);
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text-dim);
+        }
+
+        p { margin-bottom: 14px; color: #d1d5db; }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover { border-color: rgba(192, 132, 252, 0.3); }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body { color: var(--text-dim); font-size: 0.9rem; }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .tag-purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; }
+        .tag-blue { background: rgba(129, 140, 248, 0.15); color: #818cf8; }
+        .tag-green { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+        .tag-orange { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
+        .tag-pink { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+        .tag-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+        /* Code */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        pre .lang-label {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.68rem;
+            color: #6b7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.85em;
+        }
+
+        :not(pre) > code {
+            background: rgba(129, 140, 248, 0.1);
+            color: #a5b4fc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        /* Tables */
+        .table-wrap {
+            overflow-x: auto;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--surface-2);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: #d1d5db;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(192, 132, 252, 0.03); }
+
+        /* Lists */
+        ul, ol {
+            margin-bottom: 14px;
+            padding-left: 24px;
+            color: #d1d5db;
+        }
+
+        li { margin-bottom: 6px; font-size: 0.95rem; }
+        li code { font-size: 0.82em; }
+
+        /* Callouts */
+        .callout {
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+
+        .callout-title { font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .callout-tip { background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.2); }
+        .callout-tip .callout-title { color: #34d399; }
+        .callout-warn { background: rgba(251, 146, 60, 0.08); border: 1px solid rgba(251, 146, 60, 0.2); }
+        .callout-warn .callout-title { color: #fb923c; }
+        .callout-danger { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .callout-danger .callout-title { color: #ef4444; }
+        .callout-info { background: rgba(129, 140, 248, 0.08); border: 1px solid rgba(129, 140, 248, 0.2); }
+        .callout-info .callout-title { color: #818cf8; }
+
+        /* Compare */
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .compare-bad { border-left: 3px solid var(--danger); padding-left: 16px; }
+        .compare-good { border-left: 3px solid var(--accent-3); padding-left: 16px; }
+        .compare-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .compare-bad .compare-label { color: var(--danger); }
+        .compare-good .compare-label { color: var(--accent-3); }
+
+        /* Hierarchy diagram */
+        .hierarchy {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin: 24px 0;
+        }
+
+        .hierarchy-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 24px;
+            text-align: center;
+            position: relative;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .hierarchy-item .h-label { font-weight: 600; font-size: 0.95rem; }
+        .hierarchy-item .h-desc { font-size: 0.82rem; color: var(--text-dim); margin-top: 4px; }
+        .hierarchy-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+        .hierarchy-item.h-global { border-color: rgba(192, 132, 252, 0.4); }
+        .hierarchy-item.h-project { border-color: rgba(129, 140, 248, 0.4); }
+        .hierarchy-item.h-local { border-color: rgba(52, 211, 153, 0.4); }
+        .hierarchy-item.h-rules { border-color: rgba(251, 146, 60, 0.4); }
+
+        /* Links */
+        a { color: var(--accent-2); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--accent); text-decoration: underline; }
+
+        /* Checklist */
+        .checklist { list-style: none; padding-left: 0; }
+        .checklist li { padding: 6px 0 6px 28px; position: relative; }
+        .checklist li::before { content: ''; position: absolute; left: 0; top: 10px; width: 16px; height: 16px; border: 2px solid var(--accent); border-radius: 4px; }
+
+        /* File tree */
+        .file-tree {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            white-space: pre;
+            overflow-x: auto;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            color: var(--text-dim);
+        }
+
+        .file-tree .folder { color: var(--accent-2); }
+        .file-tree .file { color: #d1d5db; }
+        .file-tree .comment { color: #6b7280; }
+
+        /* Footer */
+        footer {
+            padding: 48px 0;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        footer a { color: var(--accent); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            .compare { grid-template-columns: 1fr; }
+            .card-grid { grid-template-columns: 1fr; }
+            section { padding: 40px 0; }
+        }
+
+        /* Scroll behavior */
+        html { scroll-behavior: smooth; scroll-padding-top: 60px; }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+    <div class="hero-content">
+        <h1>Claude Code 종합 설정 가이드</h1>
+        <p>CLAUDE.md 작성 베스트 프랙티스, 플러그인/MCP/스킬 세팅 관리, 그리고 커뮤니티 실전 사례를 한곳에 정리한 레퍼런스 문서</p>
+        <div class="meta">
+            <span>2026.02</span>
+            <span>&middot;</span>
+            <span>커뮤니티 리소스 참조</span>
+        </div>
+    </div>
+</header>
+
+<!-- TOC -->
+<nav class="toc">
+    <div class="toc-inner">
+        <a href="#hierarchy">계층 구조</a>
+        <a href="#writing">작성법</a>
+        <a href="#include-exclude">포함/제외</a>
+        <a href="#antipatterns">안티패턴</a>
+        <a href="#examples">실전 예시</a>
+        <a href="#modular">모듈화</a>
+        <a href="#settings">세팅 관리</a>
+        <a href="#mcp">MCP 서버</a>
+        <a href="#skills">스킬</a>
+        <a href="#hooks">Hooks</a>
+        <a href="#dotfiles">Dotfiles</a>
+        <a href="#cost">비용 최적화</a>
+        <a href="#community">커뮤니티</a>
+        <a href="#resources">리소스</a>
+        <a href="#faq">FAQ</a>
+    </div>
+</nav>
+
+<main>
+
+<!-- 1. Hierarchy -->
+<section id="hierarchy">
+<div class="container">
+    <h2><span class="num">01</span> CLAUDE.md 계층 구조</h2>
+
+    <h3>왜 설정 파일이 필요한가?</h3>
+    <p>Claude Code는 설정 없이도 작동합니다. 하지만 CLAUDE.md를 추가하면 프로젝트의 기술 스택과 컨벤션을 알고 코드를 작성합니다. 예를 들어 "Next.js App Router 사용, Server Components 기본"이라고 적어두면, 구식 Pages Router 패턴 대신 올바른 코드가 나옵니다.</p>
+
+    <h3>4단계 계층</h3>
+    <p class="section-desc">Claude Code는 여러 레벨의 설정 파일을 자동으로 읽어들입니다. 더 구체적인 파일이 우선합니다.</p>
+
+    <div class="hierarchy">
+        <div class="hierarchy-item h-global">
+            <div class="h-label"><code>~/.claude/CLAUDE.md</code> <span class="tag tag-purple">Global</span></div>
+            <div class="h-desc">모든 프로젝트에 적용 &middot; 개인 선호도, 보편 원칙, 도구 설정</div>
+        </div>
+        <div class="hierarchy-arrow">&darr;</div>
+        <div class="hierarchy-item h-project">
+            <div class="h-label"><code>./CLAUDE.md</code> <span class="tag tag-blue">Project</span></div>
+            <div class="h-desc">프로젝트별 적용 &middot; 팀 컨벤션, 기술 스택, 명령어 &middot; Git 커밋</div>
+        </div>
+        <div class="hierarchy-arrow">&darr;</div>
+        <div class="hierarchy-item h-local">
+            <div class="h-label"><code>.claude/local.md</code> <span class="tag tag-green">Local</span></div>
+            <div class="h-desc">개인 오버라이드 &middot; .gitignore 대상 &middot; 로컬 환경 설정</div>
+        </div>
+        <div class="hierarchy-arrow">&darr;</div>
+        <div class="hierarchy-item h-rules">
+            <div class="h-label"><code>.claude/rules/*.md</code> <span class="tag tag-orange">Rules</span></div>
+            <div class="h-desc">모듈형 규칙 (v2.0.64+) &middot; 자동 로드 &middot; 경로 기반 조건부 적용</div>
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">우선순위 규칙</div>
+        <p>Local &gt; Project &gt; Global 순으로 우선. <strong>Deny 규칙이 최우선</strong>. 서브디렉토리에 위치한 CLAUDE.md는 해당 영역 작업 시 자동 로드됩니다.</p>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>내용</th><th>위치</th><th>예시</th></tr></thead>
+        <tbody>
+            <tr><td>보편적 선호도</td><td><code>~/.claude/CLAUDE.md</code></td><td>"변경 후 테스트 실행", "Conventional Commits"</td></tr>
+            <tr><td>팀 표준</td><td><code>./CLAUDE.md</code></td><td>"Next.js App Router 사용", "shadcn/ui 컴포넌트"</td></tr>
+            <tr><td>개인 설정</td><td><code>.claude/local.md</code></td><td>"로컬 DB: localhost:5432"</td></tr>
+            <tr><td>도메인별 규칙</td><td><code>.claude/rules/</code></td><td>"code-style.md", "testing.md", "security.md"</td></tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+</section>
+
+<!-- 2. Writing -->
+<section id="writing">
+<div class="container">
+    <h2><span class="num">02</span> CLAUDE.md 작성 가이드</h2>
+    <p class="section-desc">핵심 원칙: WHY-WHAT-HOW 프레임워크로 구조화하고, 60~80줄 이하로 유지합니다.</p>
+
+    <h3>길이 제한 &amp; 토큰 효율성</h3>
+
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>수준</th><th>줄 수</th><th>근거</th></tr></thead>
+        <tbody>
+            <tr><td><strong>이상적</strong></td><td>60줄 이하</td><td>HumanLayer 팀의 실무 벤치마크</td></tr>
+            <tr><td><strong>최대 권장</strong></td><td>80줄</td><td>초과 시 Claude가 내용 무시 시작</td></tr>
+            <tr><td><strong>절대 한계</strong></td><td>300줄</td><td>커뮤니티 합의 최대치</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <div class="callout callout-warn">
+        <div class="callout-title">주의 예산 (Attention Budget)</div>
+        <p>Claude Code 시스템 프롬프트가 이미 ~50개 명령어를 포함합니다. 프론티어 모델도 <strong>150~200개 명령어</strong>만 안정적으로 따릅니다. <strong>모든 줄이 주의력을 위해 경쟁</strong>합니다.</p>
+    </div>
+
+    <h3>권장 섹션 구성</h3>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title"><span class="tag tag-purple">WHY</span> 프로젝트 컨텍스트</div>
+            <div class="card-body">프로젝트의 목적과 기능. 한 줄 요약으로 Claude에게 방향 제시.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-blue">WHAT</span> 기술 스택</div>
+            <div class="card-body">언어, 프레임워크, 도구. 프로젝트 구조와 디렉토리 역할.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-green">HOW</span> 명령어</div>
+            <div class="card-body">테스트, 빌드, 린트, 배포 명령어를 정확히 명시.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-orange">STYLE</span> 코드 컨벤션</div>
+            <div class="card-body">import/export 선호도, 네이밍 규칙. (단, 린터로 해결 가능한 것 제외)</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-pink">GOTCHAS</span> 주의사항</div>
+            <div class="card-body">프로젝트 특유 경고, 절대 수정하면 안 되는 파일, 특이한 제약.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-red">DON'T</span> 금지 사항</div>
+            <div class="card-body">"하지 마라"와 함께 안전한 대안 제시. 단순 금지보다 효과적.</div>
+        </div>
+    </div>
+
+    <h3>효율성 자가 진단</h3>
+    <div class="callout callout-tip">
+        <div class="callout-title">각 줄마다 자문하기</div>
+        <p><strong>"이것을 제거하면 Claude가 실수할까?"</strong> &rarr; 아니라면 삭제하세요.</p>
+    </div>
+
+    <h3>직접 만들어보기</h3>
+    <p>아래 템플릿을 프로젝트 루트에 <code>CLAUDE.md</code>로 저장하고, 주석 부분을 자신의 프로젝트에 맞게 채워보세요:</p>
+    <pre><code># [프로젝트 이름]
+
+## Overview
+[한 줄로 프로젝트 설명]
+
+## Tech Stack
+- [언어/프레임워크]
+- [DB/ORM]
+- [기타 핵심 도구]
+
+## Commands
+- [빌드 명령어]
+- [테스트 명령어]
+- [린트 명령어]
+
+## Conventions
+- [팀 코딩 컨벤션 1~3개]
+
+## Important
+- [절대 수정 금지 파일이나 주의사항]</code></pre>
+    <p>작성 후 Claude Code를 실행하여 "CLAUDE.md 내용을 요약해줘"라고 입력하면 정상 인식 여부를 확인할 수 있습니다.</p>
+</div>
+</section>
+
+<!-- 3. Include/Exclude -->
+<section id="include-exclude">
+<div class="container">
+    <h2><span class="num">03</span> 포함할 것 / 제외할 것</h2>
+    <p class="section-desc">CLAUDE.md의 모든 줄은 토큰을 소비합니다. 반드시 필요한 것만 포함하세요.</p>
+
+    <div class="compare">
+        <div class="compare-good">
+            <div class="compare-label">포함해야 할 것</div>
+            <ul>
+                <li>기술 스택 (언어, 프레임워크, DB)</li>
+                <li>프로젝트 구조 &amp; 디렉토리 역할</li>
+                <li>빌드/테스트/린트 명령어</li>
+                <li>Claude가 틀리는 패턴 교정</li>
+                <li>절대 수정 금지 파일 목록</li>
+                <li>금지 사항 + 대안 제시</li>
+                <li>선호 도구 (bun, pnpm 등)</li>
+                <li>파일:줄 참조 (Progressive Disclosure)</li>
+            </ul>
+        </div>
+        <div class="compare-bad">
+            <div class="compare-label">제외해야 할 것</div>
+            <ul>
+                <li>코드 스타일 규칙 (린터가 할 일)</li>
+                <li>코드 스니펫 임베딩 (빨리 구식화)</li>
+                <li><code>@-file</code> 참조 (매번 전체 임베딩)</li>
+                <li>성격/페르소나 지시 (토큰 낭비)</li>
+                <li>작업별 지시사항 (스킬로 분리)</li>
+                <li>자명한 내용 ("좋은 코드 작성")</li>
+                <li>중복 지시사항</li>
+                <li>프로젝트별 내용 (글로벌 파일에)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Progressive Disclosure 패턴</h3>
+    <p>모든 정보를 CLAUDE.md에 넣지 말고, <strong>중요한 정보를 찾는 방법</strong>을 알려주세요.</p>
+    <div class="compare">
+        <div class="compare-bad">
+            <div class="compare-label">Bad</div>
+            <pre><code>상세 API 가이드는 @docs/api-guide.md 참조
+(매 세션마다 전체 파일 임베드됨)</code></pre>
+        </div>
+        <div class="compare-good">
+            <div class="compare-label">Good</div>
+            <pre><code>복잡한 API 사용법은 docs/api-guide.md 참조
+인증 구현 패턴: src/auth/jwt.ts:15-65</code></pre>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- 4. Anti-patterns -->
+<section id="antipatterns">
+<div class="container">
+    <h2><span class="num">04</span> 7가지 안티패턴</h2>
+    <p class="section-desc">Boris Cherny(Claude Code 창시자) 등 커뮤니티에서 발견된 대표적인 실수들입니다.</p>
+
+    <div class="card">
+        <div class="card-title"><span class="tag tag-red">01</span> 과적재 CLAUDE.md</div>
+        <div class="card-body">
+            <p>너무 길면 Claude가 절반을 무시합니다. 중요한 규칙이 소음에 묻힙니다.</p>
+            <p><strong>해결:</strong> 80줄 이하 유지. Claude가 이미 올바르게 하는 것은 삭제.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><span class="tag tag-red">02</span> Kitchen Sink 세션 (이것저것 다 넣기)</div>
+        <div class="card-body">
+            <p>Kitchen Sink(부엌 싱크대)는 "이것저것 다 던져넣는다"는 관용 표현입니다. 여러 관련 없는 작업을 한 세션에 섞으면 컨텍스트가 오염됩니다.</p>
+            <p><strong>해결:</strong> 관련 없는 작업 간 <code>/clear</code> 사용. "AI 컨텍스트는 우유와 같다 - 신선해야 한다"</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><span class="tag tag-red">03</span> 반복 수정 악순환</div>
+        <div class="card-body">
+            <p>Claude가 틀리고, 수정하고, 또 틀리면 컨텍스트가 실패한 시도로 가득 찹니다.</p>
+            <p><strong>해결:</strong> 2회 실패 후 <code>/clear</code>하고 더 좋은 초기 프롬프트로 재시작.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><span class="tag tag-red">04</span> 문서 임베딩</div>
+        <div class="card-body">
+            <p><code>@-file</code> 참조는 매 실행마다 전체 파일을 임베드합니다.</p>
+            <p><strong>해결:</strong> 경로 참조로 대체. Claude가 필요할 때만 읽도록 유도.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><span class="tag tag-red">05</span> 린터의 일을 LLM에게</div>
+        <div class="card-body">
+            <p>들여쓰기, 세미콜론, 줄 길이 등은 결정론적 도구가 훨씬 효율적입니다.</p>
+            <p><strong>해결:</strong> Prettier, Biome, ESLint 등 린터 사용. CLAUDE.md에서 제거.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><span class="tag tag-red">06</span> 예시 없는 지시</div>
+        <div class="card-body">
+            <p>예시 없이 지시하면 Claude가 추측합니다. 1~2줄 예시만으로도 스타일이 고정됩니다.</p>
+            <p><strong>해결:</strong> 최소한의 예시 포함. 특히 네이밍, 출력 형식에 효과적.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><span class="tag tag-red">07</span> 검증 없는 완료 선언</div>
+        <div class="card-body">
+            <p>Claude가 그럴듯해 보이지만 실제로 작동 안 하는 코드를 생성할 수 있습니다.</p>
+            <p><strong>해결:</strong> 테스트, 타입 체크, 스크린샷 등 검증 기준을 명시.</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- 5. Examples -->
+<section id="examples">
+<div class="container">
+    <h2><span class="num">05</span> 실전 CLAUDE.md 예시</h2>
+    <p class="section-desc">커뮤니티에서 검증된 실제 CLAUDE.md 구조를 소개합니다.</p>
+
+    <h3>글로벌 CLAUDE.md (~/.claude/CLAUDE.md)</h3>
+    <pre><code><span class="lang-label">markdown</span># 개인 개발 선호도
+
+## 핵심 원칙
+- Clean Architecture 우선
+- 가독성 > 복잡한 솔루션
+- 변경 전 코드베이스 탐색, 복잡한 작업은 계획 후 구현
+- 변경 후 테스트 실행
+
+## 코딩 표준
+- 모든 함수에 타입 힌트/타입 정의
+- 작은 diff 선호 (요청하지 않은 리팩토링 금지)
+- 로직 변경 시 테스트 필수
+- 접근성: 레이블, 키보드 네비게이션
+
+## 도구 선호도
+- 패키지 매니저: bun (npm 대신)
+- 린터: Biome (ESLint + Prettier 대체)
+- 커밋: Conventional Commits
+- 민감 데이터 커밋 금지
+
+## 커뮤니케이션
+- 아키텍처 결정 전 명확히 질문
+- 비자명한 선택에 이유 문서화
+- 코드 주석: 영어 / 문서: 한국어</code></pre>
+
+    <h3>프로젝트 CLAUDE.md (./CLAUDE.md)</h3>
+    <pre><code><span class="lang-label">markdown</span># E-Commerce Platform
+
+## Overview
+Next.js 14 기반 전자상거래 플랫폼. App Router 사용.
+
+## Tech Stack
+- Next.js 14 (App Router) + TypeScript (strict)
+- Prisma + PostgreSQL, Tailwind CSS, Zod
+
+## Architecture
+- /app - Pages, layouts, API routes
+- /components - 재사용 컴포넌트
+- /lib - 유틸리티 및 DB 클라이언트
+- /prisma - DB 스키마
+
+## Commands
+- npm run dev        # localhost:3000
+- npm test           # Jest + RTL
+- npm run db:push    # Prisma 스키마 푸시
+- npm run lint       # ESLint + Prettier
+
+## Conventions
+- Server Components 기본, 인터랙션 필요 시만 'use client'
+- DB 쿼리는 /lib/queries에 분리
+- Zod 스키마로 모든 입력 검증
+
+## Important
+- 결제 코드는 /lib/payments 에서만 수정
+- 환경 변수는 .env.example 참고</code></pre>
+
+    <h3>자기 개선 루프</h3>
+    <div class="callout callout-tip">
+        <div class="callout-title">살아있는 문서로 유지하기</div>
+        <ol>
+            <li>Claude가 실수하면 &rarr; 수정</li>
+            <li>두 번째 동일 실수 &rarr; CLAUDE.md 업데이트</li>
+            <li>2주마다 검토: 중복 제거, 구식 정보 갱신</li>
+            <li>PR 리뷰에서 잡힌 패턴 위반 &rarr; CLAUDE.md에 추가</li>
+        </ol>
+    </div>
+</div>
+</section>
+
+<!-- 6. Modular -->
+<section id="modular">
+<div class="container">
+    <h2><span class="num">06</span> 모듈화 (.claude/rules/)</h2>
+    <p class="section-desc">v2.0.64+에서 지원. CLAUDE.md 하나로 부족할 때 도메인별로 규칙을 나눌 수 있습니다.</p>
+
+    <div class="file-tree">
+<span class="folder">.claude/</span>
+├── <span class="file">CLAUDE.md</span>              <span class="comment"># 핵심 내용만 (30줄 이하)</span>
+├── <span class="folder">rules/</span>
+│   ├── <span class="file">code-style.md</span>      <span class="comment"># 코드 스타일 규칙</span>
+│   ├── <span class="file">testing.md</span>         <span class="comment"># 테스팅 전략</span>
+│   ├── <span class="file">security.md</span>        <span class="comment"># 보안 가이드</span>
+│   └── <span class="folder">workflows/</span>
+│       └── <span class="file">api-creation.md</span> <span class="comment"># API 생성 워크플로우</span>
+└── <span class="folder">skills/</span>
+    └── <span class="folder">my-skill/</span>
+        └── <span class="file">SKILL.md</span>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title">자동 로드</div>
+            <div class="card-body"><code>rules/</code> 디렉토리의 파일은 CLAUDE.md와 동일한 우선순위로 자동 로드됩니다.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">경로 기반 조건부 적용</div>
+            <div class="card-body">YAML frontmatter의 <code>paths</code> 필드로 특정 파일 패턴에만 규칙 적용 가능.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">충돌 없는 팀 편집</div>
+            <div class="card-body">프론트엔드/백엔드 팀이 각각의 규칙 파일을 독립적으로 관리.</div>
+        </div>
+    </div>
+
+    <h3>경로 기반 규칙 예시</h3>
+    <pre><code><span class="lang-label">yaml + markdown</span>---
+paths:
+  - "src/backend/**/*.py"
+  - "tests/backend/**/*.py"
+---
+
+# Backend Python 규칙
+- FastAPI 라우트 핸들러 패턴 준수
+- Pydantic 모델로 요청/응답 정의
+- 비동기 함수 우선 사용</code></pre>
+</div>
+</section>
+
+<!-- 7. Settings -->
+<section id="settings">
+<div class="container">
+    <h2><span class="num">07</span> settings.json 설정 관리</h2>
+    <p class="section-desc">Claude Code의 핵심 설정 파일. 권한, 플러그인, 환경변수, hooks를 구조화합니다.</p>
+
+    <h3>설정 우선순위 (5단계)</h3>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>순위</th><th>위치</th><th>범위</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td><code>~/.claude/settings.json</code></td><td>전역 (모든 프로젝트)</td></tr>
+            <tr><td>2</td><td><code>.claude/settings.json</code></td><td>프로젝트 (팀 공유)</td></tr>
+            <tr><td>3</td><td><code>.claude/settings.local.json</code></td><td>프로젝트 개인</td></tr>
+            <tr><td>4</td><td>Enterprise Policy</td><td>조직 관리자</td></tr>
+            <tr><td>5</td><td>CLI 플래그</td><td>세션 단위</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <h3>권한 체인</h3>
+    <p>우선순위: <code>deny</code> &gt; <code>allow</code> &gt; <code>ask</code> &gt; <code>default</code></p>
+    <pre><code><span class="lang-label">json</span>{
+  "permissions": {
+    "allow": [
+      "Read(**/*.{js,ts,tsx,json,md})",
+      "Bash(npm *)",
+      "Bash(git status)",
+      "Bash(git diff*)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Write(node_modules/**)",
+      "Bash(rm -rf *)",
+      "Bash(git push --force)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Write(package.json)"
+    ]
+  }
+}</code></pre>
+</div>
+</section>
+
+<!-- 8. MCP -->
+<section id="mcp">
+<div class="container">
+    <h2><span class="num">08</span> MCP 서버 관리</h2>
+    <p class="section-desc">MCP(Model Context Protocol)는 Claude Code에 외부 도구를 연결하는 표준 방식입니다. 기본 상태에서는 코드 편집과 터미널 명령만 가능한데, MCP 서버를 연결하면 GitHub PR 관리, 웹 검색, 데이터베이스 조회도 할 수 있습니다.</p>
+
+    <h3>필수 MCP 서버 Top 5</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title"><span class="tag tag-purple">1</span> GitHub</div>
+            <div class="card-body">PR/이슈 관리, CI/CD 트리거. 가장 기본적인 MCP 서버.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-blue">2</span> Context7</div>
+            <div class="card-body">최신 프레임워크 문서 실시간 fetch. 할루시네이션 방지.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-green">3</span> Sequential Thinking</div>
+            <div class="card-body">구조화된 문제 해결 프로세스. 복잡한 아키텍처 결정에 유용.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-orange">4</span> Brave Search</div>
+            <div class="card-body">웹 검색 및 실시간 리서치 기능 제공.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-pink">5</span> Puppeteer</div>
+            <div class="card-body">브라우저 자동화, 스크린샷, E2E 테스트.</div>
+        </div>
+    </div>
+
+    <h3>MCP 설정 파일 (.mcp.json)</h3>
+    <pre><code><span class="lang-label">json</span>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server"]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": { "BRAVE_API_KEY": "${BRAVE_API_KEY}" }
+    }
+  }
+}</code></pre>
+
+    <div class="callout callout-info">
+        <div class="callout-title">프로젝트별 MCP</div>
+        <p>프로젝트 루트의 <code>.mcp.json</code>은 해당 프로젝트에서만 활성화됩니다. <code>~/.claude/.mcp.json</code>은 전역 MCP 설정입니다.</p>
+    </div>
+</div>
+</section>
+
+<!-- 9. Skills -->
+<section id="skills">
+<div class="container">
+    <h2><span class="num">09</span> 스킬 관리</h2>
+    <p class="section-desc">스킬(Skill)은 반복적인 워크플로우를 재사용 가능한 명령어로 패키징한 것입니다. 예를 들어 "코드 리뷰" 과정을 스킬로 만들면, 매번 같은 지시를 반복하지 않아도 됩니다. 토큰 절약을 위해 3단계(Tier)로 나눠서 필요한 만큼만 로드합니다.</p>
+
+    <h3>3-Tier 로딩 시스템</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title"><span class="tag tag-green">Tier 1</span> 메타데이터 (항상 로드)</div>
+            <div class="card-body"><code>name</code> (64자), <code>description</code> (1024자). Claude가 모든 스킬을 미리 인식.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-blue">Tier 2</span> 전체 지침 (관련 시 로드)</div>
+            <div class="card-body">SKILL.md 마크다운 본문 (500줄 이하 권장). Claude가 관련 있다고 판단 시 로드.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-purple">Tier 3</span> 연결된 파일 (필요 시)</div>
+            <div class="card-body">scripts/, references/, assets/. 지침에서 명시적 참조 시만 로드.</div>
+        </div>
+    </div>
+
+    <h3>SKILL.md 구조</h3>
+    <pre><code><span class="lang-label">markdown</span>---
+name: code-review
+description: 코드 리뷰 수행 시 사용. PR, 코드 변경, 품질 검토 요청 시 자동 활성화.
+---
+
+# 코드 리뷰 지침
+
+## 검토 영역
+1. **가독성**: 변수명, 함수명, 주석
+2. **보안**: SQL 인젝션, XSS, 인증/인가
+3. **성능**: 알고리즘 복잡도, 메모리 사용
+4. **테스트**: 테스트 커버리지, 엣지 케이스
+
+## 출력 형식
+- 긍정적 측면 먼저 언급
+- 개선 사항은 구체적 제안과 함께
+- 우선순위: Critical / High / Medium / Low</code></pre>
+
+    <div class="file-tree">
+<span class="folder">~/.claude/skills/</span>           <span class="comment"># 글로벌 스킬</span>
+└── <span class="folder">code-review/</span>
+    ├── <span class="file">SKILL.md</span>              <span class="comment"># 필수: 메타데이터 + 지침</span>
+    ├── <span class="folder">scripts/</span>              <span class="comment"># 선택: 실행 가능한 코드</span>
+    ├── <span class="folder">references/</span>           <span class="comment"># 선택: 참조 문서</span>
+    └── <span class="folder">assets/</span>               <span class="comment"># 선택: 템플릿, 아이콘</span>
+
+<span class="folder">{project}/.claude/skills/</span>   <span class="comment"># 프로젝트 스킬</span>
+    </div>
+</div>
+</section>
+
+<!-- 10. Hooks -->
+<section id="hooks">
+<div class="container">
+    <h2><span class="num">10</span> Hooks 자동화</h2>
+    <p class="section-desc">Hooks는 Claude Code가 특정 동작을 할 때 자동으로 셸 명령어를 실행하는 기능입니다. 예를 들어 "파일을 저장할 때마다 자동으로 코드 포맷팅 실행" 같은 자동화를 설정할 수 있습니다. Claude의 판단에 의존하지 않고 항상 확실하게 실행됩니다(결정론적 동작).</p>
+
+    <h3>라이프사이클 이벤트</h3>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>이벤트</th><th>시점</th><th>주요 용도</th></tr></thead>
+        <tbody>
+            <tr><td><code>PreToolUse</code></td><td>도구 실행 전</td><td>파일 보호, 위험 명령 차단</td></tr>
+            <tr><td><code>PostToolUse</code></td><td>도구 실행 후</td><td>자동 포맷팅, 린트, 테스트</td></tr>
+            <tr><td><code>SessionStart</code></td><td>세션 시작</td><td>환경변수 설정, 초기화</td></tr>
+            <tr><td><code>Stop</code></td><td>응답 완료</td><td>알림 전송, 로깅</td></tr>
+            <tr><td><code>UserPromptSubmit</code></td><td>프롬프트 제출</td><td>입력 검증, 키워드 감지</td></tr>
+            <tr><td><code>Notification</code></td><td>입력 필요</td><td>Slack/Discord 알림</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <h3>실전 Hooks 예시</h3>
+    <pre><code><span class="lang-label">json</span>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "match": "Write(**.py)",
+        "command": "black ${file} && isort ${file}",
+        "description": "Python 자동 포맷팅"
+      },
+      {
+        "match": "Write(**.{js,ts,tsx})",
+        "command": "prettier --write ${file}",
+        "description": "JS/TS 포맷팅"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "match": "Write(config/production.*)",
+        "command": "echo 'Production protected'; exit 1",
+        "description": "프로덕션 설정 보호"
+      },
+      {
+        "match": "Write(**)",
+        "command": "if grep -q 'API_KEY\\|SECRET' ${file}; then exit 1; fi",
+        "description": "민감 데이터 검출"
+      }
+    ],
+    "Stop": [
+      {
+        "command": "notify-send 'Claude Code' 'Task completed'",
+        "description": "Linux 데스크톱 알림"
+      }
+    ]
+  }
+}</code></pre>
+
+    <div class="callout callout-tip">
+        <div class="callout-title">Hook 환경 변수</div>
+        <p><code>${file}</code> &mdash; 작업 대상 파일, <code>${tool}</code> &mdash; 도구 이름, <code>$CLAUDE_PROJECT_DIR</code> &mdash; 프로젝트 루트</p>
+    </div>
+</div>
+</section>
+
+<!-- 11. Dotfiles -->
+<section id="dotfiles">
+<div class="container">
+    <h2><span class="num">11</span> Dotfiles &amp; 크로스 환경 동기화</h2>
+    <p class="section-desc">여러 머신에서 일관된 Claude Code 환경을 유지하는 방법입니다.</p>
+
+    <h3>권장 Dotfiles 구조</h3>
+    <div class="file-tree">
+<span class="folder">~/dotfiles/</span>
+├── <span class="file">README.md</span>
+├── <span class="file">install.sh</span>              <span class="comment"># 자동 설치 스크립트</span>
+├── <span class="file">.gitignore</span>
+├── <span class="folder">claude/</span>
+│   └── <span class="folder">.claude/</span>
+│       ├── <span class="file">settings.json</span>
+│       ├── <span class="file">CLAUDE.md</span>
+│       ├── <span class="file">.mcp.json</span>         <span class="comment"># MCP 서버</span>
+│       ├── <span class="folder">skills/</span>           <span class="comment"># 커스텀 스킬</span>
+│       ├── <span class="folder">hooks/</span>            <span class="comment"># 커스텀 훅</span>
+│       └── <span class="folder">rules/</span>            <span class="comment"># 모듈형 규칙</span>
+├── <span class="folder">zsh/</span>
+│   └── <span class="file">.zshrc</span>
+└── <span class="folder">git/</span>
+    └── <span class="file">.gitconfig</span>
+    </div>
+
+    <h3>심볼릭 링크 설치</h3>
+    <pre><code><span class="lang-label">bash</span>#!/bin/bash
+# install.sh
+
+# 기존 설정 백업
+[ -d ~/.claude ] && mv ~/.claude ~/.claude.bak.$(date +%Y%m%d)
+
+# 심볼릭 링크 생성
+ln -sf ~/dotfiles/claude/.claude ~/.claude
+
+# 또는 GNU Stow 사용 (권장)
+cd ~/dotfiles && stow claude</code></pre>
+
+    <h3>.gitignore 필수 항목</h3>
+    <pre><code><span class="lang-label">gitignore</span># 절대 커밋 금지
+.credentials.json
+*.local.json
+*.local.md
+.env*
+
+# 대화 히스토리 (프라이버시)
+projects/
+
+# 캐시
+*.log
+statsig/</code></pre>
+
+    <h3>커뮤니티 도구</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title"><a href="https://github.com/brianlovin/claude-config">brianlovin/claude-config</a></div>
+            <div class="card-body">7개 특화 스킬 + sync.sh 양방향 동기화</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><a href="https://www.npmjs.com/package/claude-code-config-sync">claude-code-config-sync</a></div>
+            <div class="card-body">npm 패키지로 설정 동기화 자동화.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><a href="https://github.com/miwidot/ccms">ccms</a></div>
+            <div class="card-body">Claude Code Machine Sync &mdash; 머신 간 설정 관리 도구.</div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- 12. Cost -->
+<section id="cost">
+<div class="container">
+    <h2><span class="num">12</span> 비용 최적화</h2>
+    <p class="section-desc">전략적 모델 선택과 캐싱을 조합하면 50~90% 비용 절감이 가능합니다.</p>
+
+    <h3>모델별 역할 분담</h3>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>모델</th><th>용도</th><th>비용</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Haiku 4.5</strong></td><td>빠른 단순 작업 (파일 읽기, 기본 편집)</td><td>Sonnet의 1/3</td></tr>
+            <tr><td><strong>Sonnet 4.5</strong></td><td>일상 개발 (최적 능력/비용 균형)</td><td>기준</td></tr>
+            <tr><td><strong>Opus 4.6</strong></td><td>복잡한 아키텍처, 멀티파일 추론</td><td>Sonnet의 ~1.7x</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <h3>최적화 전략 4가지</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title"><span class="tag tag-green">40~80%</span> 컨텍스트 관리</div>
+            <div class="card-body"><code>/model haiku</code> 전환, <code>/compact</code> 압축, 간결한 CLAUDE.md 유지.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-blue">90%</span> 프롬프트 캐싱</div>
+            <div class="card-body">CLAUDE.md, 시스템 프롬프트 자동 캐싱. 반복 내용은 원가의 10%.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-purple">50%</span> Batch API</div>
+            <div class="card-body">대량 분석, 비긴급 리팩토링에 사용. 모든 모델에서 50% 할인.</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="tag tag-orange">비례</span> 팀 최적화</div>
+            <div class="card-body">에이전트 수에 비례해 토큰 소비. 작업 완료 후 팀 즉시 정리.</div>
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">비용 모니터링</div>
+        <p><code>/cost</code> &mdash; 현재 세션 토큰 사용량 확인. <code>/stats</code> &mdash; 사용 패턴 분석. 평균 $6/day, 90th percentile $12/day.</p>
+    </div>
+</div>
+</section>
+
+<!-- 13. Community -->
+<section id="community">
+<div class="container">
+    <h2><span class="num">13</span> 커뮤니티 사례 &amp; 팁</h2>
+    <p class="section-desc">실제 개발자들의 검증된 워크플로우와 생산성 팁을 모았습니다.</p>
+
+    <h3>Boris Cherny (Claude Code 창시자) 워크플로우</h3>
+    <div class="card">
+        <div class="card-body">
+            <ul>
+                <li><strong>병렬 에이전트:</strong> 터미널 5개 + 브라우저 5~10개 Claude 인스턴스 동시 실행</li>
+                <li><strong>공유 메모리:</strong> CLAUDE.md 하나를 팀 전체가 주 단위로 기여. 실수할 때마다 추가</li>
+                <li><strong>슬래시 커맨드 자동화:</strong> <code>/commit-push-pr</code> 같은 커스텀 명령어로 하루 수십 번 호출</li>
+                <li><strong>Chrome 확장:</strong> 모든 변경사항 자동 테스트, UI 검증 반복</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>YK Dojo 45가지 팁 핵심</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title">컨텍스트 = 우유</div>
+            <div class="card-body">"AI 컨텍스트는 우유와 같다 - 신선하고 압축되어야 한다." 자주 <code>/clear</code>, <code>/compact</code> 사용.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Plan Mode 필수</div>
+            <div class="card-body">Shift+Tab 두 번으로 Plan Mode 진입. 구현 전 계획 검토 &rarr; 실행.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Git Worktrees</div>
+            <div class="card-body">병렬 브랜치 개발에 git worktrees 사용. 격리된 환경에서 동시 작업.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">위험 작업 격리</div>
+            <div class="card-body">장기 실행/위험한 작업은 컨테이너에서 실행. 안전망 확보.</div>
+        </div>
+    </div>
+
+    <h3>엔터프라이즈 성공 사례</h3>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>기업</th><th>규모</th><th>성과</th></tr></thead>
+        <tbody>
+            <tr><td>TELUS</td><td>57,000명</td><td>월 100B+ 토큰 처리</td></tr>
+            <tr><td>Zapier</td><td>800+ 에이전트</td><td>내부 워크플로우 자동화</td></tr>
+            <tr><td>Bridgewater</td><td>분석팀</td><td>AI 투자 분석 어시스턴트로 워크플로우 개선</td></tr>
+            <tr><td>Altana 등</td><td>-</td><td>개발 속도 2~10x 가속 (공식 사례)</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <h3>생산성 핵심 팁</h3>
+    <div class="callout callout-tip">
+        <div class="callout-title">Best Practices 요약</div>
+        <ol>
+            <li>관련 없는 작업 사이에 <code>/clear</code> 사용 (Kitchen Sink 방지)</li>
+            <li>2회 실패 후 대화 리셋 &mdash; 오염된 컨텍스트에서 벗어나기</li>
+            <li>CLAUDE.md에 <strong>실패한 시도</strong> 섹션 추가 &mdash; 다시 시도 방지</li>
+            <li>시스템 프롬프트 크기 50% 줄이기 &mdash; 토큰 효율성</li>
+            <li>테스트, 스크린샷, 예상 출력으로 <strong>자체 검증</strong> 가능하게</li>
+        </ol>
+    </div>
+</div>
+</section>
+
+<!-- 14. Resources -->
+<section id="resources">
+<div class="container">
+    <h2><span class="num">14</span> 참고 리소스</h2>
+    <p class="section-desc">커뮤니티 리소스에서 엄선한 링크 모음입니다.</p>
+
+    <h3>공식 문서</h3>
+    <ul>
+        <li><a href="https://code.claude.com/docs/en/best-practices">Best Practices for Claude Code</a> &mdash; 공식 베스트 프랙티스</li>
+        <li><a href="https://claude.com/blog/using-claude-md-files">Using CLAUDE.MD files</a> &mdash; CLAUDE.md 사용법</li>
+        <li><a href="https://code.claude.com/docs/en/settings">Claude Code Settings</a> &mdash; 설정 가이드</li>
+        <li><a href="https://code.claude.com/docs/en/mcp">Connect to tools via MCP</a> &mdash; MCP 연결</li>
+        <li><a href="https://code.claude.com/docs/en/hooks-guide">Automate workflows with hooks</a> &mdash; Hooks 가이드</li>
+        <li><a href="https://code.claude.com/docs/en/costs">Manage costs effectively</a> &mdash; 비용 관리</li>
+    </ul>
+
+    <h3>커뮤니티 가이드</h3>
+    <ul>
+        <li><a href="https://www.humanlayer.dev/blog/writing-a-good-claude-md">Writing a good CLAUDE.md</a> &mdash; HumanLayer (60줄 벤치마크 출처)</li>
+        <li><a href="https://www.builder.io/blog/claude-md-guide">The Complete Guide to CLAUDE.md</a> &mdash; Builder.io 완전 가이드</li>
+        <li><a href="https://dometrain.com/blog/creating-the-perfect-claudemd-for-claude-code/">Creating the Perfect CLAUDE.md</a> &mdash; Dometrain 멀티 언어 예시</li>
+        <li><a href="https://claudelog.com/">ClaudeLog</a> &mdash; 종합 가이드, 튜토리얼, 모범 사례</li>
+    </ul>
+
+    <h3>GitHub 레포지토리</h3>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>레포</th><th>특징</th></tr></thead>
+        <tbody>
+            <tr><td><a href="https://github.com/hesreallyhim/awesome-claude-code">awesome-claude-code</a></td><td>75+ 리소스 큐레이션</td></tr>
+            <tr><td><a href="https://github.com/affaan-m/everything-claude-code">everything-claude-code</a></td><td>Anthropic 해커톤 우승. 13개 서브에이전트, 30+ 스킬</td></tr>
+            <tr><td><a href="https://github.com/brianlovin/claude-config">brianlovin/claude-config</a></td><td>7개 스킬 + sync/install 자동화. 인기 설정 레포</td></tr>
+            <tr><td><a href="https://github.com/ChrisWiles/claude-code-showcase">claude-code-showcase</a></td><td>8개 섹션 구조. hooks, skills, agents 포함</td></tr>
+            <tr><td><a href="https://github.com/coelhoxyz/claude-code-global-config">claude-code-global-config</a></td><td>프로덕션 레디 글로벌 템플릿</td></tr>
+            <tr><td><a href="https://github.com/abhishekray07/claude-md-templates">claude-md-templates</a></td><td>Next.js, Python/FastAPI 스택별 템플릿</td></tr>
+            <tr><td><a href="https://github.com/ykdojo/claude-code-tips">claude-code-tips</a></td><td>45가지 기본~고급 팁 모음</td></tr>
+            <tr><td><a href="https://github.com/centminmod/my-claude-code-setup">my-claude-code-setup</a></td><td>메모리 뱅크 시스템. 멀티 파일 구조</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <h3>한국어 리소스</h3>
+    <ul>
+        <li><a href="https://github.com/revfactory/claude-code-guide">revfactory/claude-code-guide</a> &mdash; 한국어 바이브코딩 가이드</li>
+        <li><a href="https://github.com/revfactory/claude-code-mastering">revfactory/claude-code-mastering</a> &mdash; 한국어 마스터 가이드북</li>
+        <li><a href="https://discuss.pytorch.kr/t/30-claude-code-feat-ykdojo-claude-code-tips/8368">PyTorch 한국 커뮤니티</a> &mdash; 30가지 활용 팁</li>
+    </ul>
+
+    <h3>도구 &amp; 유틸리티</h3>
+    <ul>
+        <li><a href="https://mcpcat.io/">MCPcat.io</a> &mdash; MCP 서버 가이드 &amp; 디렉토리</li>
+        <li><a href="https://github.com/disler/claude-code-hooks-mastery">claude-code-hooks-mastery</a> &mdash; Hook 마스터 가이드</li>
+        <li><a href="https://github.com/duthaho/claudekit">claudekit</a> &mdash; 27개 명령어, 7개 모드, 34개 스킬</li>
+        <li><a href="https://github.com/VoltAgent/awesome-claude-code-subagents">awesome-claude-code-subagents</a> &mdash; 100+ 전문 서브에이전트</li>
+    </ul>
+</div>
+</section>
+
+<!-- 15. FAQ -->
+<section id="faq">
+<div class="container">
+    <h2><span class="num">15</span> FAQ &amp; 트러블슈팅</h2>
+    <p class="section-desc">자주 묻는 질문과 흔한 문제 해결 방법을 모았습니다.</p>
+
+    <h3>CLAUDE.md 관련</h3>
+
+    <div class="card">
+        <div class="card-title">CLAUDE.md를 만들었는데 Claude가 무시하는 것 같아요</div>
+        <div class="card-body">
+            <ul>
+                <li><strong>파일 위치 확인</strong>: 프로젝트 루트에 <code>CLAUDE.md</code>가 있는지 확인. 파일명 대소문자 주의</li>
+                <li><strong>길이 확인</strong>: 80줄을 넘으면 뒷부분이 무시될 수 있음. 60줄 이하 권장</li>
+                <li><strong>확인 방법</strong>: Claude Code에서 "CLAUDE.md 내용을 요약해줘"라고 물어보세요</li>
+                <li><strong>충돌 확인</strong>: 글로벌(<code>~/.claude/CLAUDE.md</code>)과 프로젝트 CLAUDE.md가 상충하는 내용이 없는지 확인</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">CLAUDE.md 규칙을 Claude가 어길 때</div>
+        <div class="card-body">
+            <ul>
+                <li>같은 규칙을 다른 표현으로 <strong>2~3번 반복</strong>하면 준수율이 높아집니다</li>
+                <li>"~하지 마라"보다 "~대신 ~해라"가 더 효과적</li>
+                <li>세션이 길어지면 <code>/compact</code>로 컨텍스트를 압축하세요</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>세션 관련</h3>
+
+    <div class="card">
+        <div class="card-title">세션이 느려졌어요</div>
+        <div class="card-body">
+            <ol>
+                <li><code>/compact</code> &mdash; 컨텍스트를 요약하여 토큰 절약</li>
+                <li><code>/clear</code> &mdash; 새 세션으로 시작 (가장 효과적)</li>
+                <li>CLAUDE.md 줄 수 확인 &mdash; 300줄 이상이면 대폭 축소</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Claude가 같은 실수를 반복해요</div>
+        <div class="card-body">
+            <ul>
+                <li><strong>2회 실패 후 <code>/clear</code></strong>: 실패한 시도가 컨텍스트에 쌓여 반복 유발</li>
+                <li>새 세션에서 더 구체적인 프롬프트로 재시도</li>
+                <li>반복되는 실수는 CLAUDE.md에 "절대 ~하지 말 것" 추가</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>MCP 관련</h3>
+
+    <div class="card">
+        <div class="card-title">MCP 서버 연결이 안 돼요</div>
+        <div class="card-body">
+<pre><code># 1. 서버 목록 및 상태 확인
+claude mcp list
+
+# 2. 특정 서버 로그 확인
+claude mcp logs [서버이름]
+
+# 3. 환경변수 확인 (API 키가 설정되어 있는지)
+echo $GITHUB_TOKEN
+echo $BRAVE_API_KEY</code></pre>
+            <ul>
+                <li><code>.mcp.json</code>의 JSON 문법 오류 확인 (쉼표, 괄호)</li>
+                <li><code>npx</code> 명령이 작동하는지 확인: <code>npx -y @modelcontextprotocol/server-github --help</code></li>
+                <li>환경변수는 <code>~/.bashrc</code> 또는 <code>~/.zshrc</code>에 <code>export</code>로 설정</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>비용 관련</h3>
+
+    <div class="card">
+        <div class="card-title">비용이 너무 많이 나와요</div>
+        <div class="card-body">
+            <ol>
+                <li><strong>모델 전환</strong>: 단순 작업은 <code>/model haiku</code> (Sonnet 대비 1/3 비용)</li>
+                <li><strong>CLAUDE.md 축소</strong>: 매 메시지마다 포함되므로 짧을수록 절약</li>
+                <li><strong><code>/compact</code> 습관화</strong>: 긴 세션의 토큰 비용 40~80% 절감</li>
+                <li><strong><code>/clear</code> 활용</strong>: 주제가 바뀌면 새 세션 시작</li>
+                <li><strong><code>/cost</code>로 모니터링</strong>: 현재 세션 사용량 실시간 확인</li>
+            </ol>
+        </div>
+    </div>
+
+    <h3>Hooks 관련</h3>
+
+    <div class="card">
+        <div class="card-title">Hook이 실행되지 않아요</div>
+        <div class="card-body">
+            <ul>
+                <li><code>settings.json</code>의 <code>hooks</code> 섹션 JSON 문법 확인</li>
+                <li><code>match</code> 패턴이 실제 도구 호출과 일치하는지 확인 (예: <code>Write(**.py)</code>)</li>
+                <li>Hook 명령어가 시스템에 설치되어 있는지 확인 (예: <code>prettier</code>, <code>black</code>)</li>
+                <li><code>command</code> 에서 직접 실행해보기: 터미널에서 해당 명령어 테스트</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>기타</h3>
+
+    <div class="card">
+        <div class="card-title">/init으로 만든 CLAUDE.md가 너무 길어요</div>
+        <div class="card-body">
+            <p><code>/init</code>이 자동 생성한 CLAUDE.md는 출발점일 뿐입니다. 반드시 60줄 이하로 축소하세요:</p>
+            <ol>
+                <li>Claude가 이미 올바르게 하는 것 삭제</li>
+                <li>린터가 처리하는 스타일 규칙 삭제</li>
+                <li>자명한 내용 ("좋은 코드를 작성하라") 삭제</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">모노레포에서 CLAUDE.md를 어떻게 관리하나요?</div>
+        <div class="card-body">
+            <p>각 패키지/서비스 디렉토리에 독립 CLAUDE.md를 두면 됩니다. Claude Code는 현재 작업 디렉토리부터 루트까지 CLAUDE.md를 자동 탐색합니다.</p>
+        </div>
+    </div>
+
+    <div class="callout callout-tip">
+        <div class="callout-title">여기서 해결되지 않는 문제는?</div>
+        <p><a href="https://code.claude.com/docs/">Anthropic 공식 문서</a>를 참고하거나, <a href="https://github.com/anthropics/claude-code/issues">GitHub 이슈</a>에서 검색해보세요.</p>
+    </div>
+</div>
+</section>
+
+</main>
+
+<footer>
+    <div class="container">
+        <p>여러 커뮤니티 리소스를 조사하여 정리한 가이드입니다.</p>
+        <p style="margin-top:8px;">2026.02 &middot; Claude Code Opus 4.6 &middot; <a href="https://code.claude.com/docs/">공식 문서</a></p>
+    </div>
+</footer>
+
+</body>
+</html>

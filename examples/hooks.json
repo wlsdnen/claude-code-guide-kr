@@ -1,0 +1,70 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "black ${file} && isort ${file}",
+            "match": "Write(**.py)"
+          }
+        ],
+        "description": "Python 파일 자동 포맷팅 (black + isort)"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write ${file}",
+            "match": "Write(**.{js,ts,tsx,jsx,css,json,md})"
+          }
+        ],
+        "description": "JS/TS/CSS/JSON/MD 자동 포맷팅 (prettier)"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '⛔ Production config is protected'; exit 1",
+            "match": "Write(config/production.*)"
+          }
+        ],
+        "description": "프로덕션 설정 파일 보호"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if grep -qE '(API_KEY|SECRET|PASSWORD|TOKEN)=' \"${file}\" 2>/dev/null; then echo '⛔ Sensitive data detected'; exit 1; fi",
+            "match": "Write(**)"
+          }
+        ],
+        "description": "민감 데이터 커밋 방지"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "notify-send 'Claude Code' 'Task completed' 2>/dev/null || true"
+          }
+        ],
+        "description": "작업 완료 데스크톱 알림 (Linux)"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Session started at $(date)' >> /tmp/claude-sessions.log"
+          }
+        ],
+        "description": "세션 시작 로깅"
+      }
+    ]
+  }
+}

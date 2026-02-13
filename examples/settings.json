@@ -1,0 +1,53 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**/*.{js,ts,tsx,json,md,css,html})",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Write(node_modules/**)",
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Write(package.json)",
+      "Write(*.lock)"
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "model": "sonnet",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write ${file}",
+            "match": "Write(**.{js,ts,tsx})"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Production config protected'; exit 1",
+            "match": "Write(config/production.*)"
+          }
+        ]
+      }
+    ]
+  }
+}
